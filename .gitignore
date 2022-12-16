@@ -1,2 +1,5 @@
 settings.json
 test_out/
+*.bak
+*.bak2
+*.bak3
