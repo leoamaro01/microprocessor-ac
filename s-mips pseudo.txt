@@ -44,10 +44,8 @@ function RUN:
             else:
                 R[targetReg] = out
         else if optype is 01: // memory
-            if op is 000: // slt
-                out, out2, CF, ZF, SF, LS, EQ, GR = ALU(arg1, aluIn2, unsigned, op)
-            
-                if LS:
+            if op is 000: // slt           
+                if A1 <= aluIn2 [unsigned]:
                     R[targetReg] = 0^31||1
                 else:
                     R[targetReg] = 0^32
@@ -103,10 +101,12 @@ function RUN:
                 TTY DATA = A1[7..0]
                 TTY ENABLE = 1
             if op is 011: // rnd
-                A3 = RANDOM
+                targetReg = arg3
+                R[targetReg] = RANDOM
             if op is 100: // kbd
                 if KBD AVAILABLE:
-                    A3 = 0^25 || KBD DATA
+                    targetReg = arg3
+                    R[targetReg] = 0^25 || KBD DATA
                     KBD ENABLE = 1
                     wait 1
                     KBD ENABLE = 0
