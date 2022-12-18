@@ -1,0 +1,122 @@
+CLR = False
+R[0..32] = 0 // Registries 
+PC = 0
+Hi = 0
+Lo = 0
+
+CPU()
+
+function CPU:
+    while True:
+        on CLR:
+            CLEAR_ALL()
+            RUN()
+
+function CLEAR_ALL:
+    R[0..32] = 0
+    PC = 0
+    Hi = 0
+    Lo = 0
+
+function RUN:
+    do
+        addr = PC
+        ins = M{addr}
+        op, optype, arg1, arg2, arg3, jump_dest, const, unsigned, i = ID(ins)
+
+        A1 = R[arg1]
+        A2 = R[arg2]
+        A3 = R[arg3]
+
+        if i:
+            aluIn2 = 0^16 || const
+            targetReg = arg2
+        else:
+            aluIn2 = A2
+            targetReg = arg3 
+
+        if optype is 00: // arithmetic or logic
+            out, out2, CF, ZF, SF, LS, EQ, GR = ALU(A1, aluIn2, unsigned)
+
+            if op is 010 or 011: // mul
+                Hi = out2
+                Lo = out
+            else:
+                R[targetReg] = out
+        else if optype is 01: // memory
+            if op is 000: // slt
+                out, out2, CF, ZF, SF, LS, EQ, GR = ALU(arg1, aluIn2, unsigned, op)
+            
+                if LS:
+                    R[targetReg] = 0^31||1
+                else:
+                    R[targetReg] = 0^32
+            else if op is 001: // lw
+                targetReg = arg2
+                addr = (A1 + const[15]^16 || const)[15..0]
+                R[targetReg] = M{addr} 
+            else if op is 010: // sw
+                addr = (A1 + const[15]^16 || const)[17..2]
+                M{addr} = A2
+            else if op is 011: // pop
+                targetReg = arg3
+                addr = SP
+                R[targetReg] = M{addr}
+                SP += 4
+            else if op is 100: // push
+                SP -= 4
+                addr = SP
+                M{addr} = A1
+            else if op is 101: // mfhi
+                targetReg = arg3
+                R[targetReg] = Hi
+            else if op is 110: // mflo
+                targetReg = arg3
+                R[targetReg] = Lo
+        else if optype is 10: // flow control
+            if op is 000: // beq
+                if A1 == A2:
+                    PC += const[15]^14 || const || 00
+            else if op is 001: // bne
+                if A1 != A2:
+                    PC += const[15]^14 || const || 00
+            else if op is 010: // blez
+                if A1 <= 0:
+                    PC += const[15]^14 || const || 00
+            else if op is 011: // bgtz
+                if A1 > 0:
+                        PC += const[15]^14 || const || 00
+            else if op is 100: // bltz
+                if A1 < 0:
+                        PC += const[15]^14 || const || 00
+            else if op is 101: // j
+                PC = PC[31..28] || jump_dest || 00
+                continue
+            else if op is 110: // jr
+                PC = A1
+                continue
+        else if optype is 11: // special
+            // op 000 is nop, skipped.
+            if op is 001: // halt
+                return
+            if op is 010: // tty
+                TTY DATA = A1[7..0]
+                TTY ENABLE = 1
+            if op is 011: // rnd
+                A3 = RANDOM
+            if op is 100: // kbd
+                if KBD AVAILABLE:
+                    A3 = 0^25 || KBD DATA
+                    KBD ENABLE = 1
+                    wait 1
+                    KBD ENABLE = 0
+                else:
+                    A3 = -1
+        PC += 4
+    while !CLR
+
+function ID(ins):
+    ...
+
+function ALU(a, b, u, op):
+    ...
