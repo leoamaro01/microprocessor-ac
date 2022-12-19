@@ -35,9 +35,9 @@ function RUN:
             aluIn2 = A2
             targetReg = arg3 
 
+        out, out2, CF, ZF, SF, LS, EQ, GR = ALU(A1, aluIn2, unsigned)
+        
         if optype is 00: // arithmetic or logic
-            out, out2, CF, ZF, SF, LS, EQ, GR = ALU(A1, aluIn2, unsigned)
-
             if op is 010 or 011: // mul
                 Hi = out2
                 Lo = out
@@ -88,15 +88,13 @@ function RUN:
                 if A1 < 0:
                         PC += const[15]^14 || const || 00
             else if op is 101: // j
-                PC = PC[31..28] || jump_dest || 00
-                continue
+                PC = [PC[31..28] || jump_dest || 00] - 4
             else if op is 110: // jr
-                PC = A1
-                continue
+                PC = A1 - 4
         else if optype is 11: // special
             // op 000 is nop, skipped.
             if op is 001: // halt
-                return
+                halt = 1
             if op is 010: // tty
                 TTY DATA = A1[7..0]
                 TTY ENABLE = 1
