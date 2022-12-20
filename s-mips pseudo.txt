@@ -102,14 +102,12 @@ function RUN:
                 targetReg = arg3
                 R[targetReg] = RANDOM
             if op is 100: // kbd
+                targetReg = arg3
                 if KBD AVAILABLE:
-                    targetReg = arg3
                     R[targetReg] = 0^25 || KBD DATA
                     KBD ENABLE = 1
-                    wait 1
-                    KBD ENABLE = 0
                 else:
-                    A3 = -1
+                    R[targetReg] = -1
         PC += 4
     while !CLR
 
