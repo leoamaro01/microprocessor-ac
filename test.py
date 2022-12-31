@@ -86,19 +86,19 @@ class TestCase:
                 self.result,
             )
             status = self.speed <= self.expected_speed
-            print(
-                "Tiempo:",
-                self.test_name,
-                " ===============================================> ",
-                "OK" if status else "FAIL",
-            )
-            print_verbose(
-                verbose_level_test_detail,
-                "Tiempo Esperado: ",
-                self.expected_speed,
-                "Tiempo Obtenido: ",
-                self.speed,
-            )
+            # print(
+            #     "Tiempo:",
+            #     self.test_name,
+            #     " ===============================================> ",
+            #     "OK" if status else "FAIL",
+            # )
+            # print_verbose(
+            #     verbose_level_test_detail,
+            #     "Tiempo Esperado: ",
+            #     self.expected_speed,
+            #     "Tiempo Obtenido: ",
+            #     self.speed,
+            # )
 
         else:
             print("Test:", self.test_name, "Debe correr el test antes")

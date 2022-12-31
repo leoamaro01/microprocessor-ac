@@ -1,0 +1,21 @@
+a = input(a)
+b = input(b)
+
+carryHi = 0
+carryLo = 0
+
+zf = false
+
+partial = b
+
+function PARUMUL(a, par, carryHi, carryLo) -> (nCarryHi, nCarryLo, zf, selected) { }
+
+do
+{
+    (nCarryHi, nCarryLo, zf, sel) = PARUMUL(a, partial, carryHi, carryLo)
+
+    partial -= sel
+    carryHi = nCarryHi
+    carryLo = nCarryLo
+}
+while(!zf)
